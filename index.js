@@ -1,7 +1,14 @@
 const express = require('express');
 const axios = require('axios');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
+const { crypto } = require('node:crypto');
+
+// Replacement for uuid v4 in CommonJS
+function uuidv4() {
+    return ([1e7]+-1e3+-4e3+-8e3+-11e10).replace(/[018]/g, c =>
+        (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+    );
+}
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -242,7 +249,10 @@ app.get('/api/stream/:ccsProductId', async (req, res) => {
 });
 
 // 404 Handler
-app.use((req, res) => {
+app.use((req, res, next) => {
+    if (req.path === '/favicon.ico' || req.path === '/favicon.png') {
+        return res.status(204).end();
+    }
     res.status(404).render('404');
 });
 
