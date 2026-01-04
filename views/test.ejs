@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Tester - Mobinime API</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        .tester-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .tester-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .tester-form h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-test {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            font-size: 1em;
+            transition: transform 0.2s;
+        }
+
+        .btn-test:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-test:active {
+            transform: translateY(0);
+        }
+
+        .btn-test:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .tester-result {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .tester-result h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .curl-section {
+            margin-bottom: 20px;
+        }
+
+        .curl-section h4,
+        .response-section h4 {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-weight: 600;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .curl-command {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            word-break: break-all;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .btn-copy {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85em;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        .btn-copy:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-copy:active {
+            transform: translateY(0);
+        }
+
+        .response-section {
+            margin-top: 15px;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 1;
+        }
+
+        .response-content {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(102, 126, 234, 0.1);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-alert {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #f5c6cb;
+        }
+
+        .success-alert {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            border-left: 4px solid #c3e6cb;
+        }
+
+        .param-info {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .link-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .link-back:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 1024px) {
+            .tester-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .curl-section h4,
+            .response-section h4 {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .button-container {
+                width: auto;
+                margin-top: 0;
+                margin-left: auto;
+            }
+
+            .btn-copy {
+                padding: 8px 12px;
+                font-size: 0.8em;
+                margin-right: 0;
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .curl-section h4,
+            .response-section h4 {
+                display: block;
+            }
+
+            .button-container {
+                display: flex;
+                gap: 6px;
+                margin-top: 10px;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .btn-copy {
+                padding: 8px 10px;
+                font-size: 0.75em;
+                margin: 0;
+                flex: 1;
+                min-width: 100px;
+                text-align: center;
+            }
+
+            .tester-container {
+                gap: 15px;
+            }
+
+            .tester-form,
+            .tester-result {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .btn-copy {
+                padding: 6px 10px;
+                font-size: 0.75em;
+            }
+
+            .response-content {
+                max-height: 300px;
+                font-size: 0.75em;
+            }
+
+            .curl-command {
+                font-size: 0.75em;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🧪 API Tester</h1>
+            <p>Test & Explore Mobinime API Endpoints</p>
+        </header>
+
+        <main class="content">
+            <a href="/" class="link-back">← Back to Documentation</a>
+
+            <div class="tester-container">
+                <!-- Form Section -->
+                <div class="tester-form">
+                    <h3>Test Endpoint</h3>
+                    
+                    <div class="form-group">
+                        <label for="endpoint">Select Endpoint</label>
+                        <select id="endpoint" onchange="updateForm()">
+                            <option value="">-- Choose an endpoint --</option>
+                            <option value="home">GET /api/home</option>
+                            <option value="search">GET /api/search</option>
+                            <option value="detail">GET /api/detail/:id</option>
+                            <option value="stream">GET /api/stream/:ccsProductId</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Parameters -->
+                    <div id="params-container"></div>
+
+                    <button class="btn-test" id="testBtn" onclick="testAPI()">Execute Request</button>
+                </div>
+
+                <!-- Result Section -->
+                <div class="tester-result">
+                    <h3>Response</h3>
+                    <div id="result-container">
+                        <p style="color: #999; text-align: center;">Select an endpoint and click "Execute Request"</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Mobinime API Tester | Test your API calls easily</p>
+        </footer>
+    </div>
+
+    <script>
+        const endpoints = {
+            home: {
+                url: '/api/home',
+                params: []
+            },
+            search: {
+                url: '/api/search',
+                params: [
+                    { name: 'q', label: 'Search Query', type: 'text', default: '', required: true },
+                    { name: 'page', label: 'Page', type: 'number', default: '1' },
+                    { name: 'count', label: 'Count', type: 'number', default: '18' }
+                ]
+            },
+            detail: {
+                url: '/api/detail/:id',
+                params: [
+                    { name: 'id', label: 'Product ID', type: 'text', default: '', required: true }
+                ]
+            },
+            stream: {
+                url: '/api/stream/:ccsProductId',
+                params: [
+                    { name: 'ccsProductId', label: 'CCS Product ID', type: 'text', default: '', required: true }
+                ]
+            }
+        };
+
+        function updateForm() {
+            const endpoint = document.getElementById('endpoint').value;
+            const container = document.getElementById('params-container');
+            container.innerHTML = '';
+
+            if (!endpoint) {
+                document.getElementById('testBtn').disabled = true;
+                return;
+            }
+
+            document.getElementById('testBtn').disabled = false;
+            const config = endpoints[endpoint];
+            
+            config.params.forEach(param => {
+                const group = document.createElement('div');
+                group.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.htmlFor = param.name;
+                label.textContent = param.label;
+                if (param.required) label.textContent += ' *';
+                group.appendChild(label);
+
+                let input;
+                if (param.type === 'select') {
+                    input = document.createElement('select');
+                    input.id = param.name;
+                    input.name = param.name;
+                    param.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt;
+                        option.textContent = opt;
+                        input.appendChild(option);
+                    });
+                    input.value = param.default;
+                } else {
+                    input = document.createElement('input');
+                    input.type = param.type;
+                    input.id = param.name;
+                    input.name = param.name;
+                    input.value = param.default;
+                    input.placeholder = param.label;
+                }
+
+                group.appendChild(input);
+                container.appendChild(group);
+            });
+        }
+
+        async function testAPI() {
+            const endpoint = document.getElementById('endpoint').value;
+            if (!endpoint) return;
+
+            const config = endpoints[endpoint];
+            let url = config.url;
+            const params = {};
+            const pathParams = {};
+
+            // Collect parameters
+            config.params.forEach(param => {
+                const value = document.getElementById(param.name)?.value || '';
+                if (value) {
+                    if (url.includes(`:${param.name}`)) {
+                        pathParams[param.name] = value;
+                    } else {
+                        params[param.name] = value;
+                    }
+                }
+            });
+
+            // Replace path parameters
+            Object.keys(pathParams).forEach(key => {
+                url = url.replace(`:${key}`, pathParams[key]);
+            });
+
+            // Build query string
+            const queryString = new URLSearchParams(params).toString();
+            const fullUrl = queryString ? `${url}?${queryString}` : url;
+
+            // Show loading
+            const resultContainer = document.getElementById('result-container');
+            resultContainer.innerHTML = '<div class="loading"><div class="spinner"></div>Loading...</div>';
+
+            try {
+                const response = await fetch(fullUrl);
+                const data = await response.json();
+
+                // Generate cURL command
+                const domain = window.location.origin;
+                const curlCommand = `curl "${domain}${fullUrl}"`;
+
+                // Format JSON response
+                const jsonFormatted = JSON.stringify(data, null, 2);
+
+                // Display result
+                resultContainer.innerHTML = `
+                    <div class="curl-section">
+                        <h4>
+                            <span>cURL Command</span>
+                            <button class="btn-copy" onclick="copyCurl()">Copy</button>
+                        </h4>
+                        <div class="curl-command" id="curlCmd">${escapeHtml(curlCommand)}</div>
+                    </div>
+                    <div class="response-section">
+                        <h4>
+                            <span>JSON Response</span>
+                            <div class="button-container">
+                                <button class="btn-copy" onclick="downloadJSON()">📥 Download JSON</button>
+                                <button class="btn-copy" onclick="copyJSON()">Copy JSON</button>
+                            </div>
+                        </h4>
+                        <div class="response-content" id="jsonResponse">${escapeHtml(jsonFormatted)}</div>
+                    </div>
+                `;
+
+                // Store the response data for download
+                window.lastResponse = data;
+
+                if (response.ok && data.success) {
+                    resultContainer.innerHTML = '<div class="success-alert">✓ Request successful</div>' + resultContainer.innerHTML;
+                } else if (!response.ok || !data.success) {
+                    resultContainer.innerHTML = '<div class="error-alert">✗ Error: ' + escapeHtml(data.error || 'Unknown error') + '</div>' + resultContainer.innerHTML;
+                }
+            } catch (error) {
+                resultContainer.innerHTML = `<div class="error-alert">✗ Error: ${escapeHtml(error.message)}</div>`;
+            }
+        }
+
+        function copyCurl() {
+            const curlText = document.getElementById('curlCmd').textContent;
+            navigator.clipboard.writeText(curlText).then(() => {
+                alert('cURL command copied to clipboard!');
+            });
+        }
+
+        function downloadJSON() {
+            if (!window.lastResponse) {
+                alert('No response data to download');
+                return;
+            }
+
+            const endpoint = document.getElementById('endpoint').value;
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const filename = `mobinime-${endpoint}-${timestamp}.json`;
+
+            const dataStr = JSON.stringify(window.lastResponse, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyJSON() {
+            const jsonText = document.getElementById('jsonResponse').textContent;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                alert('JSON response copied to clipboard!');
+            }).catch(() => {
+                alert('Failed to copy to clipboard');
+            });
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+    </script>
+</body>
+</html>
